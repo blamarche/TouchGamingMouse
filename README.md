@@ -1,0 +1,41 @@
+# TouchGamingMouse
+
+## Overview
+TouchGamingMouse is an overlay tool that allows many Windows games to be playable using a touchscreen device such as a Surface Pro or 2-in-1 laptop. Due to certain implementation decisions, most Windows games don't respond properly to touch events and have issues such as not registering taps as clicks, registering taps as double-clicks, or any other number of undesired behavior. Games that should work well with touch screens such as turn based strategy and grand strategy games are normally totally unplayable!
+
+TouchGaming mouse addresses this in two ways. The first and perhaps most critical way is by intercepting mouse events and resending them in a way that most DirectX games will properly detect and handle as normal mouse events. In addition, it adds an overlay with commonly used keyboard keys and extra mouse buttons that are normally not possible with a Windows touch screen. These are by located along the bottom and right edge of the screen by default.
+
+A great example of the type of games made playable with TouchGamingMouse are the Grand Strategy games created by Paradox Interactive such as Stellaris, Europa Universalis IV, Hearts of Iron IV, etc.
+
+![Screenshot](https://i.imgur.com/woOrwfo.jpg)
+
+## Usage
+
+* Install AutoHotkey
+* Download and install TouchGamingMouse from the releases section
+* Run TouchGamingMouse
+* Run your game in borderless window mode, or windowed mode.
+* When done, right click the TouchGamingMouse icon in the system tray to exit.
+
+## Known Issues
+
+* While TouchGamingMouse is running, the new Steam library doesn't seem to render updates. After quitting a game, you'll need to quit TouchGamingMouse for Steam to become responsive.
+
+## Thanks
+Thank you to the developers of AutoHotkey!
+
+# Development
+
+## License
+Code: GPLv3
+
+## Contribution
+Feel free to submit pull requests containing feature enhancements. Any submitted pull request code must be licensed GPLv3 to be included.  
+
+## Roadmap
+
+* Replace AutoHotkey dependency, or bundle it within the app itself.
+* Process-based grid profile loading.
+
+## Build
+Load the Visual Studio project in VS2019. Ensure all dependencies/references are present. Build & Run.
