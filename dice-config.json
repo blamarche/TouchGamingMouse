@@ -1,0 +1,241 @@
+{
+  "Name": "Dice Macros for Discord",
+  "Width": 36,
+  "Height": 18,
+  "Opacity": 0.9,
+  "UseAutohotkey": true,
+  "AutohotkeyFile": "dice-macros.ahk",
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 35,
+      "Row": 0,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "plus": {
+      "Content": "+",
+      "Column": 34,
+      "Row": 7,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_ADD"
+    },
+    "d4": {
+      "Content": "d4",
+      "Column": 34,
+      "Row": 8,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F1",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "d6": {
+      "Content": "d6",
+      "Column": 34,
+      "Row": 9,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F2",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "d8": {
+      "Content": "d8",
+      "Column": 34,
+      "Row": 10,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F3",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "d10": {
+      "Content": "d10",
+      "Column": 34,
+      "Row": 11,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F4",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "d12": {
+      "Content": "d12",
+      "Column": 34,
+      "Row": 12,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F5",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "d20": {
+      "Content": "d20",
+      "Column": 34,
+      "Row": 13,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F6",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "d100": {
+      "Content": "d100",
+      "Column": 34,
+      "Row": 14,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F7",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "m2": {
+			"Content":"-2",
+			"Row": 6,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F1",
+            "TypeFlag":1
+		},
+    "m1": {
+			"Content":"-1",
+			"Row": 7,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F2",
+            "TypeFlag":1
+    },
+    "p0": {
+			"Content":"+0",
+			"Row": 8,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F9",
+            "TypeFlag":1
+    },
+    "p1": {
+			"Content":"+1",
+			"Row": 9,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F3",
+            "TypeFlag":1
+		},
+    "p2": {
+			"Content":"+2",
+			"Row": 10,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F4",
+            "TypeFlag":1
+		},
+    "p3": {
+			"Content":"+3",
+			"Row": 11,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F5",
+            "TypeFlag":1
+		},
+    "p4": {
+			"Content":"+4",
+			"Row": 12,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F6",
+            "TypeFlag":1
+		},
+    "p5": {
+			"Content":"+5",
+			"Row": 13,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F7",
+            "TypeFlag":1
+		},
+    "p6": {
+			"Content":"+6",
+			"Row": 14,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F8",
+            "TypeFlag":1
+    },
+    "p7": {
+			"Content":"+7",
+			"Row": 15,
+			"Column":35,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F10",
+            "TypeFlag":1
+    },
+    "n1": {
+			"Content":"🎲 1",
+			"Row": 7,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F8"
+		},
+    "n2": {
+			"Content":"🎲 2",
+			"Row": 8,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F9"
+		},
+    "n3": {
+			"Content":"🎲 3",
+			"Row": 9,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F10"
+		},
+    "n4": {
+			"Content":"🎲 4",
+			"Row": 10,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F11"
+		},
+    "n5": {
+			"Content":"🎲 5",
+			"Row": 11,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F12"
+		},
+    "n6": {
+			"Content":"🎲 6",
+			"Row": 12,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F13"
+		},
+    "n7": {
+			"Content":"🎲 7",
+			"Row": 13,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F14"
+		},
+    "n8": {
+			"Content":"🎲 8",
+			"Row": 14,
+			"Column":33,
+			"Type":"KeyPress",
+            "TypeParam":"DIK_F15"
+		}
+  }
+}

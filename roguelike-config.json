@@ -1,0 +1,443 @@
+﻿{
+  "Name": "Roguelike",
+  "Width": 27,
+  "Height": 18,
+  "Opacity": 0.9,
+  "UseAutohotkey": false,
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 0,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Esc": {
+      "Content": "Esc",
+      "Column": 2,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_ESCAPE",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Space": {
+      "Content": "Spc",
+      "Column": 3,
+      "Row": 17,
+      "ColSpan": 2,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_SPACE",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Enter": {
+      "Content": "Entr",
+      "Column": 5,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_RETURN"
+    },
+    "left": {
+      "Content": "←",
+      "Column": 24,
+      "Row": 5,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_LEFT"
+    },
+    "right": {
+      "Content": "→",
+      "Column": 26,
+      "Row": 5,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_RIGHT"
+    },
+    "up": {
+      "Content": "↑",
+      "Column": 25,
+      "Row": 4,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_UP"
+    },
+    "down": {
+      "Content": "↓",
+      "Column": 25,
+      "Row": 5,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_DOWN"
+    },
+
+    "mgrab": {
+      "Content": "g̲rab",
+      "Column": 25,
+      "Row": 12,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_G"
+    },
+    "mleft": {
+      "Content": "h←",
+      "Column": 24,
+      "Row": 12,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_H"
+    },
+    "mright": {
+      "Content": "l→",
+      "Column": 26,
+      "Row": 12,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_L"
+    },
+    "mup": {
+      "Content": "k↑",
+      "Column": 25,
+      "Row": 11,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_K"
+    },
+    "mdown": {
+      "Content": "j↓",
+      "Column": 25,
+      "Row": 13,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_J"
+    },
+    "mleftu": {
+      "Content": "y🡔",
+      "Column": 24,
+      "Row": 11,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Y"
+    },
+    "mrightu": {
+      "Content": "u🡕",
+      "Column": 26,
+      "Row": 11,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_U"
+    },
+    "mleftd": {
+      "Content": "b🡗",
+      "Column": 24,
+      "Row": 13,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_B"
+    },
+    "mrightd": {
+      "Content": "n🡖",
+      "Column": 26,
+      "Row": 13,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_N"
+    },
+    
+    "q": {
+      "Content": "q",
+      "Column": 7,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Q"
+    },
+    "w": {
+      "Content": "w",
+      "Column": 8,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_W"
+    },
+    "e": {
+      "Content": "e",
+      "Column": 9,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_E"
+    },
+    "r": {
+      "Content": "r",
+      "Column":10,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_R"
+    },
+    "t": {
+      "Content": "t",
+      "Column":11,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_T"
+    },
+    "y": {
+      "Content": "y",
+      "Column": 12,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Y"
+    },
+    "u": {
+      "Content": "u",
+      "Column":13,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_U"
+    },
+    "i": {
+      "Content": "i",
+      "Column": 14,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_I"
+    },
+    "o": {
+      "Content": "o",
+      "Column":15,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_O"
+    },
+    "p": {
+      "Content": "p",
+      "Column":16,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_P"
+    },
+
+    "a": {
+      "Content": "a",
+      "Column": 7,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_A"
+    },
+    "s": {
+      "Content": "s",
+      "Column": 8,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_S"
+    },
+    "d": {
+      "Content": "d",
+      "Column": 9,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_D"
+    },
+    "f": {
+      "Content": "f",
+      "Column":10,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F"
+    },
+    "g": {
+      "Content": "g",
+      "Column":11,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_G"
+    },
+    "h": {
+      "Content": "h",
+      "Column": 12,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_H"
+    },
+    "j": {
+      "Content": "j",
+      "Column":13,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_J"
+    },
+    "k": {
+      "Content": "k",
+      "Column": 14,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_K"
+    },
+    "l": {
+      "Content": "l",
+      "Column":15,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_L"
+    },
+    
+    "z": {
+      "Content": "z",
+      "Column": 7,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Z"
+    },
+    "x": {
+      "Content": "x",
+      "Column": 8,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_X"
+    },
+    "c": {
+      "Content": "c",
+      "Column": 9,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_C"
+    },
+    "v": {
+      "Content": "v",
+      "Column":10,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_V"
+    },
+    "b": {
+      "Content": "b",
+      "Column":11,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_B"
+    },
+    "n": {
+      "Content": "n",
+      "Column": 12,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_N"
+    },
+    "m": {
+      "Content": "m",
+      "Column":13,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_M"
+    },
+
+    "period": {
+      "Content": "wait",
+      "Column":25,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_PERIOD"
+    },
+    "n5": {
+      "Content": "rest",
+      "Column":26,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_5"
+    },
+
+    "dns": {
+      "Content": "<",
+      "Column":23,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_COMMA",
+      "TypeFlag":3
+    },
+    "ups": {
+      "Content": ">",
+      "Column":24,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_PERIOD",
+      "TypeFlag":3
+    },
+
+    "mm": {
+      "Content": "skills",
+      "Column":25,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_M"
+    },
+    "mM": {
+      "Content": "spells",
+      "Column":26,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_M",
+      "TypeFlag": 3
+    },
+        
+    "examine": {
+      "Content": "ex̲amine",
+      "Column":23,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_X"
+    },
+    "autoex": {
+      "Content": "explo̲re",
+      "Column":24,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_O"
+    },
+        
+    "open": {
+      "Content": "O̲pen",
+      "Column":23,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_O",
+      "TypeFlag": 3
+    },
+    "close": {
+      "Content": "C̲lose",
+      "Column":24,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_C",
+      "TypeFlag": 3
+    },
+    "autofight": {
+      "Content": "fight",
+      "Column":25,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_TAB"
+    },
+
+    "lshift": {
+      "Content": "Shift",
+      "Column":16,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_LSHIFT"
+    },
+
+    "ability": {
+      "Content": "ability",
+      "Column":22,
+      "Row": 15,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_A"
+    },
+    "cast": {
+      "Content": "cast",
+      "Column":22,
+      "Row": 16,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Z"
+    },
+    "evoke": {
+      "Content": "ev̲oke",
+      "Column":22,
+      "Row": 17,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_V"
+    }
+  }
+}

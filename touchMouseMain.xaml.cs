@@ -67,7 +67,7 @@ namespace TouchGamingMouse
             public int RowSpan { get; set; }
             public string Type { get; set; } //KeyPress, KeyPress2, KeyToggle, HideShow, LMouse, RMouse, MMouse, HMouse, ScrollUp, ScrollDown, ScrollArea (todo)
             public string TypeParam { get; set; } //DIK_SPACE, LEFTSHIFT etc
-            public float TypeFlag { get; set; }
+            public float TypeFlag { get; set; } //for KeyPress types: 0 = no mod, 1 = ctrl, 2 = alt, 3 = shift
             public int RepeatDelay { get; set; } //if > 0, tells scrollup/down to repeat when held down
         }
         
@@ -115,6 +115,11 @@ namespace TouchGamingMouse
             if (!Options.ForceNoAhk && Config.UseAutohotkey && File.Exists(Config.AutohotkeyFile))
             {
                 ahkProc = System.Diagnostics.Process.Start(Config.AutohotkeyFile);
+            }
+
+            if (Config.Opacity>0)
+            {
+                this.Opacity = Config.Opacity;
             }
         }
 
@@ -588,6 +593,18 @@ namespace TouchGamingMouse
             var r = InputHelper.GetKeyType(Config.Buttons[b.Name].TypeParam);
             if (r.Dxkeyfound)
             {
+                switch (Config.Buttons[b.Name].TypeFlag)
+                {
+                    case 1:
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_LCONTROL, false, InputHelper.InputType.Keyboard);
+                        break;
+                    case 2:
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_LALT, false, InputHelper.InputType.Keyboard);
+                        break;
+                    case 3:
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_LSHIFT, false, InputHelper.InputType.Keyboard);
+                        break;
+                }
                 InputHelper.SendKey(r.Dxkey, false, InputHelper.InputType.Keyboard);
             }
             else if (r.Vkeyfound)
@@ -604,6 +621,18 @@ namespace TouchGamingMouse
             if (r.Dxkeyfound)
             {
                 InputHelper.SendKey(r.Dxkey, true, InputHelper.InputType.Keyboard);
+                switch (Config.Buttons[b.Name].TypeFlag)
+                {
+                    case 1:
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_LCONTROL, true, InputHelper.InputType.Keyboard);
+                        break;
+                    case 2:
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_LALT, true, InputHelper.InputType.Keyboard);
+                        break;
+                    case 3:
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_LSHIFT, true, InputHelper.InputType.Keyboard);
+                        break;
+                }
             }
             else if (r.Vkeyfound)
             {
@@ -774,7 +803,7 @@ namespace TouchGamingMouse
 	""Name"":""Paradox"",
 	""Width"":27,
 	""Height"":18,
-	""Opacity"":1.0,
+	""Opacity"":0.8,
     ""UseAutohotkey"":true,
 	""Buttons"": {
 		""HideShow"": {

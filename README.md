@@ -21,6 +21,17 @@ A great example of the type of games made playable with TouchGamingMouse are the
 
 * While TouchGamingMouse is running, the new Steam library doesn't seem to render updates. After quitting a game, you'll need to quit TouchGamingMouse for Steam to become responsive.
 
+## Advanced Usage
+```
+Command line options for TouchGamingMouse:
+--config=<file.json> | Specify a specific config file to load so different games can have their own profile.
+--writeconfig | Creates the file config.json with the built-in default config, or the contents of the file specified with --config, then exits.
+---noahk | Forces the application to skip launching the autohotkey script, even if the config specifies otherwise.
+--skipahkcheck | By default the application checks if Autohotkey is installed and warns the user if its not, this options suppresses that message.
+```
+
+Example: `TouchGamingMouse.exe --config=dice-config.json`
+
 ## Thanks
 Thank you to the developers of AutoHotkey!
 

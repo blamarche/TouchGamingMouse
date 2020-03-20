@@ -1,0 +1,1 @@
+start TouchGamingMouse.exe --config=dice-config.json

@@ -1,0 +1,1 @@
+start TouchGamingMouse.exe --config=roguelike-config.json
