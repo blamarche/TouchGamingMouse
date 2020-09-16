@@ -1,0 +1,1 @@
+start TouchGamingMouse.exe --config=crypt-of-the-necrodancer.json

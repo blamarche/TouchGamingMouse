@@ -10,7 +10,7 @@
         Closing="Window_Closing" 
         PreviewStylusDown="Window_StylusDown"
         PreviewTouchMove="Window_TouchMove" PreviewTouchUp="Window_TouchUp" PreviewTouchDown="Window_TouchDown"
-        Title="Touch Gaming Mouse - github.com/blamarche" Height="600" Width="900" Cursor="None" ResizeMode="NoResize" Background="{x:Null}" Opacity="0.7" AllowsTransparency="True" WindowStyle="None" Icon="icon.png"
+        Title="Touch Gaming Mouse - github.com/blamarche" Height="600" Width="900" Cursor="Cross" ResizeMode="NoResize" Background="{x:Null}" Opacity="0.7" AllowsTransparency="True" WindowStyle="None" Icon="icon.png"
         >
     <Window.Resources>
         <Style x:Key="FocusVisual">

@@ -1,0 +1,87 @@
+﻿{
+  "Name": "Roguelike",
+  "Width": 21,
+  "Height": 14,
+  "Opacity": 0.9,
+  "UseAutohotkey": false,
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 0,
+      "Row": 14,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Esc": {
+      "Content": "Esc",
+      "Column": 2,
+      "Row": 14,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_ESCAPE",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "left": {
+      "Content": "←",
+      "Column": 0,
+      "Row": 9,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_LEFT"
+    },
+    "right": {
+      "Content": "→",
+      "Column": 11,
+      "Row": 9,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_RIGHT"
+    },
+    "up": {
+      "Content": "↑",
+      "Column": 10,
+      "Row": 8,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_UP"
+    },
+    "down": {
+      "Content": "↓",
+      "Column": 10,
+      "Row": 10,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_DOWN"
+    },
+    "l": {
+      "Content": "←",
+      "Column": 18,
+      "Row": 9,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_LEFT"
+    },
+    "r": {
+      "Content": "→",
+      "Column": 20,
+      "Row": 9,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_RIGHT"
+    },
+    "u": {
+      "Content": "↑",
+      "Column": 19,
+      "Row": 8,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_UP"
+    },
+    "d": {
+      "Content": "↓",
+      "Column": 19,
+      "Row": 10,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_DOWN"
+    }
+  }
+}

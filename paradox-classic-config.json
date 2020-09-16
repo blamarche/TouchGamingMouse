@@ -1,0 +1,198 @@
+{
+  "Name": "Paradox",
+  "Width": 27,
+  "Height": 18,
+  "Opacity": 0.800000012,
+  "UseAutohotkey": true,
+  "MouseInterceptMode": false,
+  "AutohotkeyFile": "autohotkey.ahk",
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 0,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "LMouse": {
+      "Content": "\uD83D\uDDB1L",
+      "Column": 18,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "LMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "MMouse": {
+      "Content": "\uD83D\uDDB1M",
+      "Column": 19,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "MMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "RMouse": {
+      "Content": "\uD83D\uDDB1R",
+      "Column": 20,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "RMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "HMouse": {
+      "Content": "\uD83D\uDDB1\u2629",
+      "Column": 17,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "ScUp": {
+      "Content": "\u2B61",
+      "Column": 4,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ScrollUp",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 250
+    },
+    "ScDn": {
+      "Content": "\u2B63",
+      "Column": 5,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ScrollDown",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 250
+    },
+    "Esc": {
+      "Content": "Esc",
+      "Column": 8,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_ESCAPE",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Space": {
+      "Content": "Spc",
+      "Column": 9,
+      "Row": 17,
+      "ColSpan": 2,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_SPACE",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Enter": {
+      "Content": "Entr",
+      "Column": 11,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_RETURN",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "LShift": {
+      "Content": "Shft",
+      "Column": 26,
+      "Row": 7,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyToggle",
+      "TypeParam": "DIK_LSHIFT",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "LCtrl": {
+      "Content": "Ctrl",
+      "Column": 26,
+      "Row": 8,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyToggle",
+      "TypeParam": "DIK_LCONTROL",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "LAlt": {
+      "Content": "Alt",
+      "Column": 26,
+      "Row": 9,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyToggle",
+      "TypeParam": "DIK_LALT",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "left": {
+      "Content": "\u2190",
+      "Column": 26,
+      "Row": 12,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_LEFT",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "right": {
+      "Content": "\u2192",
+      "Column": 26,
+      "Row": 13,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_RIGHT",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "up": {
+      "Content": "\u2191",
+      "Column": 26,
+      "Row": 11,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_UP",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "down": {
+      "Content": "\u2193",
+      "Column": 26,
+      "Row": 14,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_DOWN",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    }
+  }
+}

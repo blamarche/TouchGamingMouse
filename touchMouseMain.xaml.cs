@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -38,7 +39,11 @@ namespace TouchGamingMouse
         private GridConfig Config;
         private LaunchOptions Options = new LaunchOptions { ConfigFile = "", ForceNoAhk = false };
         private System.Diagnostics.Process ahkProc;
-        
+
+        private List<Button> mouseButtons = new List<Button>();
+        private Button interceptButton;
+        private int interceptMode = 0; //0: Move only, 1: left click, 2: middle click, 3: right click 
+
         public struct LaunchOptions
         {
             public string ConfigFile { get; set; }
@@ -54,6 +59,7 @@ namespace TouchGamingMouse
             public int Height { get; set; }
             public float Opacity { get; set; }
             public bool UseAutohotkey { get; set; }
+            public bool MouseInterceptMode { get; set; }
             public string AutohotkeyFile { get; set; }
             public Dictionary<string, ButtonConfig> Buttons { get; set; }
         }
@@ -273,6 +279,11 @@ namespace TouchGamingMouse
                 mainGrid.RowDefinitions.Add(new RowDefinition());
             }
 
+            if (config.MouseInterceptMode)
+            {
+                interceptButton = CreateInterceptButton();
+                mainGrid.Children.Add(interceptButton);
+            }
             foreach (KeyValuePair<string, ButtonConfig> entry in config.Buttons)
             {
                 var b = CreateButton(entry.Value, entry.Key);
@@ -281,6 +292,32 @@ namespace TouchGamingMouse
             if (config.AutohotkeyFile == null)
                 config.AutohotkeyFile = "autohotkey.ahk";
             Config = config;
+        }
+
+        private Button CreateInterceptButton()
+        {
+            Button b = new Button();
+            b.Name = "";
+            b.FontWeight = FontWeight.FromOpenTypeWeight(700);
+            b.Style = this.FindResource("mainButtonStyle") as Style;
+            b.Margin = new Thickness(0);
+            b.Background = buttonColor;
+            b.Foreground = buttonForeground;
+            Grid.SetColumn(b, 0);
+            Grid.SetRow(b, 0);
+            Grid.SetRowSpan(b, 30);
+            Grid.SetColumnSpan(b, 30);
+            b.Content = "";
+            
+            b.PreviewTouchDown += Intercept_TouchDown;
+            b.PreviewTouchUp += Intercept_TouchUp;
+            //b.StylusDown += Intercept_TouchDown;
+            //b.StylusUp += Intercept_TouchUp;
+
+            b.Opacity = 0.005;
+            b.Visibility = Visibility.Hidden;
+
+            return b;
         }
 
         private Button CreateButton(ButtonConfig c, string name)
@@ -328,21 +365,25 @@ namespace TouchGamingMouse
                 case "LMouse":
                     b.PreviewTouchDown += BtnLMouse_TouchDown;
                     b.StylusDown += BtnLMouse_TouchDown;
+                    mouseButtons.Add(b);
                     break;
 
                 case "MMouse":
                     b.PreviewTouchDown += BtnMMouse_TouchDown;
                     b.StylusDown += BtnMMouse_TouchDown;
+                    mouseButtons.Add(b);
                     break;
 
                 case "RMouse":
                     b.PreviewTouchDown += BtnRMouse_TouchDown;
                     b.StylusDown += BtnRMouse_TouchDown;
+                    mouseButtons.Add(b);
                     break;
 
                 case "HMouse":
                     b.PreviewTouchDown += BtnHover_TouchDown;
                     b.StylusDown += BtnHover_TouchDown;
+                    mouseButtons.Add(b);
                     break;
 
                 case "KeyPress":
@@ -708,45 +749,165 @@ namespace TouchGamingMouse
         private void BtnMMouse_TouchDown(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            mouseDisabler.EnableMouse(false);
-            if (mButtonMode == "")
+            if (Config.MouseInterceptMode)
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14,false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, true, InputHelper.InputType.Keyboard);
-                //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_MIDDLEDOWN));
-                mButtonMode = "down";
-                styleButton((Button)sender, true);
+                if (mButtonMode == "")
+                {
+                    ResetButtonModeStyles();
+                    mButtonMode = "down";
+                    interceptMode = 2;
+                    interceptButton.Visibility = Visibility.Visible;
+                    styleButton((Button)sender, true);
+                }
+                else
+                {
+                    mButtonMode = "";
+                    interceptMode = 0;
+                    interceptButton.Visibility = Visibility.Hidden;
+                    styleButton((Button)sender, false);
+                }
             }
-            else if (mButtonMode == "down")
+            else
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, true, InputHelper.InputType.Keyboard);
-                //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_MIDDLEUP));
-                styleButton((Button)sender, false);
-                mButtonMode = "";
-            }            
+                mouseDisabler.EnableMouse(false);
+                if (mButtonMode == "")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, true, InputHelper.InputType.Keyboard);
+                    //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_MIDDLEDOWN));
+                    mButtonMode = "down";
+                    styleButton((Button)sender, true);
+                }
+                else if (mButtonMode == "down")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F14, true, InputHelper.InputType.Keyboard);
+                    //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_MIDDLEUP));
+                    styleButton((Button)sender, false);
+                    mButtonMode = "";
+                }
+            }
+        }
+
+        private void Intercept_TouchDown(object sender, TouchEventArgs e)
+        {
+            e.Handled = true;
+            mouseDisabler.EnableMouse(false);
+
+            //hide window
+            CursorPosition.MoveCursorTo(e.GetTouchPoint(null).Position.X, e.GetTouchPoint(null).Position.Y); 
+            this.WindowState = WindowState.Minimized;
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(16);
+            timer.Tick += InterceptDownTimer;
+            timer.Start();            
+        }
+
+        private InputHelper.MouseEventF GetInterceptButton(bool up)
+        {
+            switch (interceptMode)
+            {
+                case 0:
+                    return InputHelper.MouseEventF.MOUSEEVENTF_MOVE;
+                case 1:
+                    return (!up) ? InputHelper.MouseEventF.MOUSEEVENTF_LEFTDOWN : InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP;
+                case 2:
+                    return (!up) ? InputHelper.MouseEventF.MOUSEEVENTF_MIDDLEDOWN : InputHelper.MouseEventF.MOUSEEVENTF_MIDDLEUP;
+                case 3:
+                    return (!up) ? InputHelper.MouseEventF.MOUSEEVENTF_RIGHTDOWN : InputHelper.MouseEventF.MOUSEEVENTF_RIGHTUP;
+            }
+
+            return InputHelper.MouseEventF.MOUSEEVENTF_MOVE;
+        }
+
+        private void InterceptDownTimer(object sender, EventArgs e)
+        {
+            if (interceptMode != 0)
+            {
+                InputHelper.SendMouse((uint)(GetInterceptButton(false)));
+            }
+            ((DispatcherTimer)sender).Stop();
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(16);
+            timer.Tick += InterceptUpTimer;
+            timer.Start();
+        }
+
+        private void InterceptUpTimer(object sender, EventArgs e)
+        {
+            if (interceptMode != 0)
+            {
+                InputHelper.SendMouse((uint)(GetInterceptButton(true)));
+            }
+            ((DispatcherTimer)sender).Stop();
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(50);
+            timer.Tick += InterceptShowWindow;
+            timer.Start();
+        }
+
+        private void InterceptShowWindow(object sender, EventArgs e)
+        {
+            this.WindowState = WindowState.Normal;
+            ((DispatcherTimer)sender).Stop();
+           
+        }
+
+        private void Intercept_TouchUp(object sender, TouchEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void ResetButtonModeStyles()
+        {
+            foreach (var b in mouseButtons)
+            {
+                styleButton(b, false);
+            }
+            interceptButton.Visibility = Visibility.Hidden;
         }
 
         private string rButtonMode = "";
         private void BtnRMouse_TouchDown(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            mouseDisabler.EnableMouse(false);
-            if (rButtonMode == "")
+            if (Config.MouseInterceptMode)
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, true, InputHelper.InputType.Keyboard);
-                //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_RIGHTDOWN));
-                rButtonMode = "down";
-                styleButton((Button)sender, true);
+                if (rButtonMode == "")
+                {
+                    ResetButtonModeStyles();
+                    interceptMode = 3;
+                    rButtonMode = "down";
+                    interceptButton.Visibility = Visibility.Visible;
+                    styleButton((Button)sender, true);
+                }
+                else
+                {
+                    interceptMode = 0;
+                    rButtonMode = "";
+                    interceptButton.Visibility = Visibility.Hidden;
+                    styleButton((Button)sender, false);
+                }
             }
-            else if (rButtonMode == "down")
+            else
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, true, InputHelper.InputType.Keyboard);
-                //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_RIGHTUP));
-                styleButton((Button)sender, false);
-                rButtonMode = "";
+                mouseDisabler.EnableMouse(false);
+                if (rButtonMode == "")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, true, InputHelper.InputType.Keyboard);
+                    //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_RIGHTDOWN));
+                    rButtonMode = "down";
+                    styleButton((Button)sender, true);
+                }
+                else if (rButtonMode == "down")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F15, true, InputHelper.InputType.Keyboard);
+                    //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_RIGHTUP));
+                    styleButton((Button)sender, false);
+                    rButtonMode = "";
+                }
             }
         }
 
@@ -754,42 +915,86 @@ namespace TouchGamingMouse
         private void BtnLMouse_TouchDown(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            mouseDisabler.EnableMouse(false);
-            if (lButtonMode == "")
+
+            if (Config.MouseInterceptMode)
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, true, InputHelper.InputType.Keyboard);
-                lButtonMode = "down";
-                styleButton((Button)sender, true);
-            }
-            else if (lButtonMode == "down")
+                if (lButtonMode == "")
+                {
+                    ResetButtonModeStyles();
+                    lButtonMode = "down";
+                    interceptMode = 1;
+                    interceptButton.Visibility = Visibility.Visible;
+                    styleButton((Button)sender, true);
+                }
+                else
+                {
+                    lButtonMode = "";
+                    interceptMode = 0;
+                    interceptButton.Visibility = Visibility.Hidden;
+                    styleButton((Button)sender, false);
+                }
+            } 
+            else
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, true, InputHelper.InputType.Keyboard);
-                styleButton((Button)sender, false);
-                lButtonMode = "";
-            }
+                mouseDisabler.EnableMouse(false);
+                if (lButtonMode == "")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, true, InputHelper.InputType.Keyboard);
+                    lButtonMode = "down";
+                    styleButton((Button)sender, true);
+                }
+                else if (lButtonMode == "down")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_SCROLL, true, InputHelper.InputType.Keyboard);
+                    styleButton((Button)sender, false);
+                    lButtonMode = "";
+                }
+            }            
         }
 
         private string hoverMode = ""; //this mode good for reading tooltips
         private void BtnHover_TouchDown(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            mouseDisabler.EnableMouse(false);
-            if (hoverMode == "")
+
+            if (Config.MouseInterceptMode)
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, true, InputHelper.InputType.Keyboard);
-                hoverMode = "down";
-                styleButton((Button)sender, true);
+                if (hoverMode == "")
+                {
+                    ResetButtonModeStyles();
+                    hoverMode = "down";
+                    interceptMode = 0;
+                    interceptButton.Visibility = Visibility.Visible;
+                    styleButton((Button)sender, true);
+                }
+                else
+                {
+                    hoverMode = "";
+                    interceptMode = 0;
+                    interceptButton.Visibility = Visibility.Hidden;
+                    styleButton((Button)sender, false);
+                }
             }
-            else if (hoverMode == "down")
+            else
             {
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, false, InputHelper.InputType.Keyboard);
-                InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, true, InputHelper.InputType.Keyboard);
-                //btnHover.Content = "🖱☩";
-                hoverMode = "";
-                styleButton((Button)sender, false);
+                mouseDisabler.EnableMouse(false);
+                if (hoverMode == "")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, true, InputHelper.InputType.Keyboard);
+                    hoverMode = "down";
+                    styleButton((Button)sender, true);
+                }
+                else if (hoverMode == "down")
+                {
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, false, InputHelper.InputType.Keyboard);
+                    InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_F13, true, InputHelper.InputType.Keyboard);
+                    //btnHover.Content = "🖱☩";
+                    hoverMode = "";
+                    styleButton((Button)sender, false);
+                }
             }
         }
                
@@ -800,17 +1005,24 @@ namespace TouchGamingMouse
 
         
         private string ConfigDefault = @"{
-	""Name"":""Paradox"",
+	""Name"":""ParadoxNew"",
 	""Width"":27,
 	""Height"":18,
 	""Opacity"":0.8,
-    ""UseAutohotkey"":true,
+    ""UseAutohotkey"":false,
+    ""MouseInterceptMode"":true,
 	""Buttons"": {
 		""HideShow"": {
 			""Content"":""-"",
 			""Row"":17,
 			""Column"":0,
 			""Type"":""HideShow""
+		},
+		""LMouse"": {
+			""Content"":""🖱L"",
+			""Row"":17,
+			""Column"":18,
+			""Type"":""LMouse""
 		},
 		""MMouse"": {
 			""Content"":""🖱M"",
@@ -827,18 +1039,18 @@ namespace TouchGamingMouse
 		""HMouse"": {
 			""Content"":""🖱☩"",
 			""Row"":17,
-			""Column"":18,
+			""Column"":17,
 			""Type"":""HMouse""
 		},
 		""ScUp"": {
-			""Content"":""⭡"",
+			""Content"":""🖱⭡"",
 			""Row"":17,
 			""Column"":4,
 			""Type"":""ScrollUp"",
             ""RepeatDelay"":250
 		},
 		""ScDn"": {
-			""Content"":""⭣"",
+			""Content"":""🖱⭣"",
 			""Row"":17,
 			""Column"":5,
 			""Type"":""ScrollDown"",
@@ -868,25 +1080,53 @@ namespace TouchGamingMouse
 		},
 		""LShift"": {
 			""Content"":""Shft"",
-			""Row"": 9,
+			""Row"": 7,
 			""Column"":26,
 			""Type"":""KeyToggle"",
 			""TypeParam"":""DIK_LSHIFT""
 		},
 		""LCtrl"": {
 			""Content"":""Ctrl"",
-			""Row"": 10,
+			""Row"": 8,
 			""Column"":26,
 			""Type"":""KeyToggle"",
 			""TypeParam"":""DIK_LCONTROL""
 		},
 		""LAlt"": {
 			""Content"":""Alt"",
-			""Row"": 11,
+			""Row"": 9,
 			""Column"":26,
 			""Type"":""KeyToggle"",
 			""TypeParam"":""DIK_LALT""
-		}
+		},
+        ""left"": {
+            ""Content"": ""←"",
+            ""Column"": 26,
+            ""Row"": 12,
+            ""Type"": ""KeyPress"",
+            ""TypeParam"": ""DIK_LEFT""
+        },
+        ""right"": {
+            ""Content"": ""→"",
+            ""Column"": 26,
+            ""Row"": 13,
+            ""Type"": ""KeyPress"",
+            ""TypeParam"": ""DIK_RIGHT""
+        },
+        ""up"": {
+            ""Content"": ""↑"",
+            ""Column"": 26,
+            ""Row"": 11,
+            ""Type"": ""KeyPress"",
+            ""TypeParam"": ""DIK_UP""
+        },
+        ""down"": {
+            ""Content"": ""↓"",
+            ""Column"": 26,
+            ""Row"": 14,
+            ""Type"": ""KeyPress"",
+            ""TypeParam"": ""DIK_DOWN""
+        }
 	}
 }";
 
