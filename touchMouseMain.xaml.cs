@@ -96,6 +96,7 @@ namespace TouchGamingMouse
             this.Topmost = true;
             this.WindowStyle = WindowStyle.None;
             this.WindowState = WindowState.Maximized;
+            this.Focusable = false;
 
             InitializeGrid();
 
@@ -522,6 +523,10 @@ namespace TouchGamingMouse
                 {}
             }
             (sender as Button).Content = isHidden ? "+" : "-";
+            if (Config.MouseInterceptMode)
+            {
+                ResetButtonModeStyles();
+            }
             mouseDisabler.EnableMouse();
         }
 
@@ -763,8 +768,7 @@ namespace TouchGamingMouse
                 {
                     mButtonMode = "";
                     interceptMode = 0;
-                    interceptButton.Visibility = Visibility.Hidden;
-                    styleButton((Button)sender, false);
+                    ResetButtonModeStyles();
                 }
             }
             else
@@ -848,7 +852,7 @@ namespace TouchGamingMouse
 
         private void InterceptShowWindow(object sender, EventArgs e)
         {
-            this.WindowState = WindowState.Normal;
+            this.WindowState = WindowState.Maximized;
             ((DispatcherTimer)sender).Stop();
            
         }
@@ -860,11 +864,17 @@ namespace TouchGamingMouse
 
         private void ResetButtonModeStyles()
         {
+            mButtonMode = "";
+            rButtonMode = "";
+            lButtonMode = "";
+            hoverMode = "";
             foreach (var b in mouseButtons)
             {
                 styleButton(b, false);
             }
             interceptButton.Visibility = Visibility.Hidden;
+            this.WindowState = WindowState.Minimized;
+            this.WindowState = WindowState.Maximized;
         }
 
         private string rButtonMode = "";
@@ -885,8 +895,7 @@ namespace TouchGamingMouse
                 {
                     interceptMode = 0;
                     rButtonMode = "";
-                    interceptButton.Visibility = Visibility.Hidden;
-                    styleButton((Button)sender, false);
+                    ResetButtonModeStyles();
                 }
             }
             else
@@ -930,8 +939,7 @@ namespace TouchGamingMouse
                 {
                     lButtonMode = "";
                     interceptMode = 0;
-                    interceptButton.Visibility = Visibility.Hidden;
-                    styleButton((Button)sender, false);
+                    ResetButtonModeStyles();
                 }
             } 
             else
@@ -973,8 +981,7 @@ namespace TouchGamingMouse
                 {
                     hoverMode = "";
                     interceptMode = 0;
-                    interceptButton.Visibility = Visibility.Hidden;
-                    styleButton((Button)sender, false);
+                    ResetButtonModeStyles();
                 }
             }
             else
@@ -1104,28 +1111,28 @@ namespace TouchGamingMouse
             ""Column"": 26,
             ""Row"": 12,
             ""Type"": ""KeyPress"",
-            ""TypeParam"": ""DIK_LEFT""
+            ""TypeParam"": ""DIK_A""
         },
         ""right"": {
             ""Content"": ""→"",
             ""Column"": 26,
             ""Row"": 13,
             ""Type"": ""KeyPress"",
-            ""TypeParam"": ""DIK_RIGHT""
+            ""TypeParam"": ""DIK_D""
         },
         ""up"": {
             ""Content"": ""↑"",
             ""Column"": 26,
             ""Row"": 11,
             ""Type"": ""KeyPress"",
-            ""TypeParam"": ""DIK_UP""
+            ""TypeParam"": ""DIK_W""
         },
         ""down"": {
             ""Content"": ""↓"",
             ""Column"": 26,
             ""Row"": 14,
             ""Type"": ""KeyPress"",
-            ""TypeParam"": ""DIK_DOWN""
+            ""TypeParam"": ""DIK_S""
         }
 	}
 }";
