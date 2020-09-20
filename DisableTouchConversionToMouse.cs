@@ -45,25 +45,28 @@ namespace TouchGamingMouse
         {
             if (nCode >= 0)
             {
-                var info = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
-                        
-                var extraInfo = (uint)info.dwExtraInfo.ToInt32();
-                if ((extraInfo & MOUSEEVENTF_MASK) == MOUSEEVENTF_FROMTOUCH || (extraInfo & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH)
-                //if ((extraInfo & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH)
+                try
                 {
-                    if ((extraInfo & 0x80) != 0)
-                    {
-                        //Touch Input
-                        return new IntPtr(1);
-                    }
-                    else
-                    {
-                        //Pen Input
-                        return new IntPtr(1);
-                    }
+                    var info = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
 
-                }
-                //return new IntPtr(1);
+                    var extraInfo = (uint)info.dwExtraInfo.ToInt32();
+                    if ((extraInfo & MOUSEEVENTF_MASK) == MOUSEEVENTF_FROMTOUCH || (extraInfo & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH)
+                    //if ((extraInfo & MOUSEEVENTF_FROMTOUCH) == MOUSEEVENTF_FROMTOUCH)
+                    {
+                        if ((extraInfo & 0x80) != 0)
+                        {
+                            //Touch Input
+                            return new IntPtr(1);
+                        }
+                        else
+                        {
+                            //Pen Input
+                            return new IntPtr(1);
+                        }
+
+                    }
+                    //return new IntPtr(1);
+                } catch (Exception e) { }
             }
 
             return UnsafeNativeMethods.CallNextHookEx(hookId, nCode, wParam, lParam);

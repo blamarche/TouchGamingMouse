@@ -1,9 +1,9 @@
 #InputLevel 3
-
-SLEEP_DELAY:=3 ;this will need to be adjusted per machine performance most likely
+;SendMode Input
+SLEEP_DELAY:=2 ;this will need to be adjusted per machine performance most likely
                ;as it works around the weird microsoft behavior in directx games
 
-SLEEP_DELAYUP:=33
+SLEEP_DELAYUP:=50
 
 SetDefaultMouseSpeed, 0
 SetMouseDelay, -1

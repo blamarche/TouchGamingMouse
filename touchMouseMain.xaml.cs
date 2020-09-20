@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -57,6 +58,7 @@ namespace TouchGamingMouse
             public string Name { get; set; }
             public int Width { get; set; }
             public int Height { get; set; }
+            public double FontSize { get; set; }
             public float Opacity { get; set; }
             public bool UseAutohotkey { get; set; }
             public bool MouseInterceptMode { get; set; }
@@ -112,7 +114,7 @@ namespace TouchGamingMouse
             Application.Current.Exit += Application_Exit;
 
             //check for autohotkey
-            if (!Options.SkipAhkCheck)
+            if (!Options.SkipAhkCheck && Config.UseAutohotkey)
             {
                 if (!Utils.IsAutohotkeyAssociated(Config.AutohotkeyFile))
                 {
@@ -280,6 +282,8 @@ namespace TouchGamingMouse
                 mainGrid.RowDefinitions.Add(new RowDefinition());
             }
 
+            Config = config;
+
             if (config.MouseInterceptMode)
             {
                 interceptButton = CreateInterceptButton();
@@ -292,7 +296,6 @@ namespace TouchGamingMouse
             }
             if (config.AutohotkeyFile == null)
                 config.AutohotkeyFile = "autohotkey.ahk";
-            Config = config;
         }
 
         private Button CreateInterceptButton()
@@ -327,6 +330,8 @@ namespace TouchGamingMouse
             b.Name = name;
             b.FontWeight = FontWeight.FromOpenTypeWeight(700);
             b.Style = this.FindResource("mainButtonStyle") as Style;
+            if (Config.FontSize>0)
+                b.FontSize = Config.FontSize;
             b.Margin = new Thickness(0);
             b.Background = buttonColor;
             b.Foreground = buttonForeground;
@@ -404,6 +409,11 @@ namespace TouchGamingMouse
                     b.StylusDown += KeyToggle_Down;
                     break;
 
+                case "ShowKeyboard":
+                    b.PreviewTouchDown += ShowKeyboard_TouchDown;
+                    b.StylusDown += ShowKeyboard_TouchDown;
+                    break;
+
                 default:
                     // ? warn here
                     break;
@@ -447,27 +457,27 @@ namespace TouchGamingMouse
         private void Window_TouchUp(object sender, TouchEventArgs e)
         {
             //e.Handled = true;
-            //Test code for potential special mouse functionality down the road
-            /*
-            if (buttonMode == "middle")
-            {
-                mainGrid.Background = gridColorTrans;
-                btnEscape.Content = (int)e.GetTouchPoint(null).Position.X + "\n" + (int)e.GetTouchPoint(null).Position.Y;
-                btnMMouse.Content = "MM";
-                e.Handled = true;
-                buttonMode = "";
+        }
 
-                CursorPosition.MoveCursorTo(e.GetTouchPoint(null).Position.X, e.GetTouchPoint(null).Position.Y);
+        private void ShowKeyboard_TouchDown(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            try
+            {                
+                ProcessStartInfo p = new ProcessStartInfo(Environment.GetFolderPath(Environment.SpecialFolder.System)+"\\cmd.exe", "/c start %WINDIR%\\System32\\osk.exe");
+                p.UseShellExecute = true;
+                p.CreateNoWindow = true;
+                p.WindowStyle = ProcessWindowStyle.Hidden;
+                p.RedirectStandardOutput = false;
+                p.RedirectStandardInput = false;
+                p.RedirectStandardError = false;
                 
-                
-                mouseDisabler.EnableMouse();
-            }
-            else if (buttonMode=="middleDown")
+                Process.Start(p);
+
+            } catch (Exception er)
             {
-                buttonMode = "middle"; //TODO: attach touchUp to button, e.handled=true
-                e.Handled = true;
-            }          
-            */
+                MessageBox.Show(er.ToString());
+            }
         }
 
         //dynamic scrolling        
@@ -832,7 +842,7 @@ namespace TouchGamingMouse
             }
             ((DispatcherTimer)sender).Stop();
             var timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(16);
+            timer.Interval = TimeSpan.FromMilliseconds(22);
             timer.Tick += InterceptUpTimer;
             timer.Start();
         }
@@ -845,7 +855,7 @@ namespace TouchGamingMouse
             }
             ((DispatcherTimer)sender).Stop();
             var timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(50);
+            timer.Interval = TimeSpan.FromMilliseconds(55);
             timer.Tick += InterceptShowWindow;
             timer.Start();
         }
@@ -1018,6 +1028,7 @@ namespace TouchGamingMouse
 	""Opacity"":0.8,
     ""UseAutohotkey"":false,
     ""MouseInterceptMode"":true,
+    ""FontSize"":24,
 	""Buttons"": {
 		""HideShow"": {
 			""Content"":""-"",
@@ -1085,31 +1096,44 @@ namespace TouchGamingMouse
 			""Type"":""KeyPress"",
 			""TypeParam"":""DIK_RETURN""
 		},
+        ""Tab"": {
+			""Content"":""Tab"",
+			""Row"": 17,
+			""Column"":12,
+			""Type"":""KeyPress"",
+			""TypeParam"":""DIK_TAB""
+		},
+        ""Keyboard"": {
+			""Content"":""🖮"",
+			""Row"": 6,
+			""Column"":26,
+			""Type"":""ShowKeyboard""
+		},
 		""LShift"": {
 			""Content"":""Shft"",
 			""Row"": 7,
 			""Column"":26,
-			""Type"":""KeyToggle"",
+			""Type"":""KeyPress"",
 			""TypeParam"":""DIK_LSHIFT""
 		},
 		""LCtrl"": {
 			""Content"":""Ctrl"",
 			""Row"": 8,
 			""Column"":26,
-			""Type"":""KeyToggle"",
+			""Type"":""KeyPress"",
 			""TypeParam"":""DIK_LCONTROL""
 		},
 		""LAlt"": {
 			""Content"":""Alt"",
 			""Row"": 9,
 			""Column"":26,
-			""Type"":""KeyToggle"",
+			""Type"":""KeyPress"",
 			""TypeParam"":""DIK_LALT""
 		},
         ""left"": {
             ""Content"": ""←"",
-            ""Column"": 26,
-            ""Row"": 12,
+            ""Column"": 25,
+            ""Row"": 13,
             ""Type"": ""KeyPress"",
             ""TypeParam"": ""DIK_A""
         },
@@ -1123,7 +1147,7 @@ namespace TouchGamingMouse
         ""up"": {
             ""Content"": ""↑"",
             ""Column"": 26,
-            ""Row"": 11,
+            ""Row"": 12,
             ""Type"": ""KeyPress"",
             ""TypeParam"": ""DIK_W""
         },
