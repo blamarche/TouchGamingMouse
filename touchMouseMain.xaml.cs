@@ -836,10 +836,10 @@ namespace TouchGamingMouse
 
         private void InterceptDownTimer(object sender, EventArgs e)
         {
-            if (interceptMode != 0)
-            {
-                InputHelper.SendMouse((uint)(GetInterceptButton(false)));
-            }
+            //if (interceptMode != 0)
+            //{
+              InputHelper.SendMouse((uint)(GetInterceptButton(false)));
+            //}
             ((DispatcherTimer)sender).Stop();
             var timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(22);
@@ -862,7 +862,16 @@ namespace TouchGamingMouse
 
         private void InterceptShowWindow(object sender, EventArgs e)
         {
-            this.WindowState = WindowState.Maximized;
+            if (interceptMode==0)
+            {
+                mouseDisabler.EnableMouse(false);
+                this.WindowState = WindowState.Maximized;
+                //ResetButtonModeStyles();
+            }
+            else
+            {
+                this.WindowState = WindowState.Maximized;
+            }
             ((DispatcherTimer)sender).Stop();
            
         }
