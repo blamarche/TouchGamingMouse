@@ -1,0 +1,100 @@
+{
+  "Name": "Minimal",
+  "Width": 27,
+  "Height": 24,
+  "FontSize": 20,
+  "Opacity": 0.8000000,
+  "UseAutohotkey": false,
+  "MouseInterceptMode": true,
+  "AutohotkeyFile": null,
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 0,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "LMouse": {
+      "Content": "\uD83D\uDDB1L",
+      "Column": 18,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "LMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "MMouse": {
+      "Content": "\uD83D\uDDB1M",
+      "Column": 19,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "MMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "RMouse": {
+      "Content": "\uD83D\uDDB1R",
+      "Column": 20,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "RMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "HMouse": {
+      "Content": "\uD83D\uDDB1\u2629",
+      "Column": 17,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "ScUp": {
+      "Content": "\uD83D\uDDB1\u2B61",
+      "Column": 9,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ScrollUp",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 250
+    },
+    "ScDn": {
+      "Content": "\uD83D\uDDB1\u2B63",
+      "Column":10,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ScrollDown",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 250
+    },
+    "Keyboard": {
+      "Content": "\uD83D\uDDAE",
+      "Column": 21,
+      "Row": 23,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ShowKeyboard",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    }
+  }
+}

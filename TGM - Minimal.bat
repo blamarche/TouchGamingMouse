@@ -1,0 +1,1 @@
+start TouchGamingMouse.exe --config=minimal-config.json
