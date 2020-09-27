@@ -36,21 +36,21 @@
     },
     "right": {
       "Content": "→",
-      "Column": 11,
+      "Column": 2,
       "Row": 9,
       "Type": "KeyPress",
       "TypeParam": "DIK_RIGHT"
     },
     "up": {
       "Content": "↑",
-      "Column": 10,
+      "Column": 1,
       "Row": 8,
       "Type": "KeyPress",
       "TypeParam": "DIK_UP"
     },
     "down": {
       "Content": "↓",
-      "Column": 10,
+      "Column": 1,
       "Row": 10,
       "Type": "KeyPress",
       "TypeParam": "DIK_DOWN"
