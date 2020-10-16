@@ -315,8 +315,8 @@ namespace TouchGamingMouse
             
             b.PreviewTouchDown += Intercept_TouchDown;
             b.PreviewTouchUp += Intercept_TouchUp;
-            //b.StylusDown += Intercept_TouchDown;
-            //b.StylusUp += Intercept_TouchUp;
+            b.StylusDown += Intercept_TouchDown;
+            b.StylusUp += Intercept_TouchUp;
 
             b.Opacity = 0.005;
             b.Visibility = Visibility.Hidden;
@@ -803,13 +803,26 @@ namespace TouchGamingMouse
             }
         }
 
-        private void Intercept_TouchDown(object sender, TouchEventArgs e)
+        private void Intercept_TouchDown(object sender, RoutedEventArgs e)
         {
+            double x, y;
+            try
+            {
+                TouchEventArgs ee = (TouchEventArgs)e;
+                x = ee.GetTouchPoint(null).Position.X;
+                y = ee.GetTouchPoint(null).Position.Y;
+            } 
+            catch (Exception ex)
+            {
+                StylusEventArgs ee = (StylusEventArgs)e;
+                x = ee.GetPosition(null).X;
+                y = ee.GetPosition(null).Y;
+            }
             e.Handled = true;
             mouseDisabler.EnableMouse(false);
 
             //hide window
-            CursorPosition.MoveCursorTo(e.GetTouchPoint(null).Position.X, e.GetTouchPoint(null).Position.Y); 
+            CursorPosition.MoveCursorTo(x,y); 
             this.WindowState = WindowState.Minimized;
             var timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(16);
@@ -880,7 +893,7 @@ namespace TouchGamingMouse
            
         }
 
-        private void Intercept_TouchUp(object sender, TouchEventArgs e)
+        private void Intercept_TouchUp(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
         }
