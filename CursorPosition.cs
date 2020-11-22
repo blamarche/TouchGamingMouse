@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace TouchGamingMouse
 {
-    static class CursorPosition
+    public static class CursorPosition
     {
         private static PointInter lastNonZeroPos;
 
@@ -71,6 +67,26 @@ namespace TouchGamingMouse
         public static void MoveCursorToLastGood()
         {
             MoveCursorTo(lastNonZeroPos.X, lastNonZeroPos.Y);            
+            //InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_MOVE), 0, 0,100000);
+        }
+
+        public static int GetLastScaledGoodX()
+        {
+            return GetScaledX((double)lastNonZeroPos.X);
+        }
+
+        public static int GetLastScaledGoodY()
+        {
+            return GetScaledY((double)lastNonZeroPos.Y);
+        }
+
+        public static int GetScaledX(double X)
+        {
+            return (int)(65535.0f * X / System.Windows.SystemParameters.PrimaryScreenWidth);
+        }
+        public static int GetScaledY(double Y)
+        {
+            return (int)(65535.0f * Y / System.Windows.SystemParameters.PrimaryScreenHeight);
         }
 
         public static void MoveCursorTo(double unscaled_x, double unscaled_y)
@@ -78,9 +94,23 @@ namespace TouchGamingMouse
             //NOTE: we must have 'false' set in dpi-aware app.manifest for this calculation to work. there has got to be a better way
             lastNonZeroPos.X = (int)unscaled_x;
             lastNonZeroPos.Y = (int)unscaled_y;
-            var x = 65535.0f * unscaled_x / System.Windows.SystemParameters.PrimaryScreenWidth;
-            var y = 65535.0f * unscaled_y / System.Windows.SystemParameters.PrimaryScreenHeight;
+            var x = GetScaledX(unscaled_x);
+            var y = GetScaledY(unscaled_y);
             InputHelper.SendMouse((uint)(InputHelper.MouseEventF.MOUSEEVENTF_ABSOLUTE | InputHelper.MouseEventF.MOUSEEVENTF_MOVE), 0, (int)x, (int)y);
+        }
+
+        public static Rectangle GetScreenCenter(double scale, bool square)
+        {
+            double cx = System.Windows.SystemParameters.PrimaryScreenWidth / 2.0f;
+            double cy = System.Windows.SystemParameters.PrimaryScreenHeight / 2.0f;
+
+            double ax = System.Windows.SystemParameters.PrimaryScreenWidth * scale;
+            double ay = System.Windows.SystemParameters.PrimaryScreenHeight * scale;
+
+            if (square)
+                return new Rectangle((int)(cx - ax / 2), (int)(cy - ax / 2), (int)ax, (int)ax);
+
+            return new Rectangle((int)(cx - ax / 2), (int)(cy - ay / 2), (int)ax, (int)ay);
         }
     }
 }

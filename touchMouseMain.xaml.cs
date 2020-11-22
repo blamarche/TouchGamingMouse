@@ -5,7 +5,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,13 +19,19 @@ namespace TouchGamingMouse
     /// </summary>
     public partial class MainWindow : Window
     {
-        const int CURSOR_WATCHER_FRAMEDELAY = 4; //8 = 125hz, 4= 250hz etc
-        const int MOUSE_DISABLER_DELAY = 10; 
-        //make sure windows doesnt try to move the 'real' mouse cursor, and if so, move it back
+        const int CURSOR_WATCHER_FRAMEDELAY = 8; //8 = 125hz, 4= 250hz etc
+        const int MOUSE_DISABLER_DELAY = 10;
+        const int GESTURE_TIMER_DELAY = 10;
+        const double GESTURE_AREA_SCALE = 0.25;
+        const double GESTURE_AREA_END_SCALE = 0.25;
+        const int GESTURE_MAX_HISTORY = 20;
+        const double GESTURE_DIVERT_AREA_SCALE = 0.25;
+        const double GESTURE_ZIG_CARDINAL_AREA_SCALE = 0.05;
 
         private WindowInteropHelper helper;
         private int origStyle;
         private MouseDisabler mouseDisabler;
+        private GestureRuntimeProps gestureProps;
 
         private Brush gridColorOpaque = new SolidColorBrush(Color.FromArgb(0x01, 0, 0, 0));
         private Brush gridColorTrans = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
@@ -44,7 +49,7 @@ namespace TouchGamingMouse
         private List<Button> mouseButtons = new List<Button>();
         private Button interceptButton;
         private int interceptMode = 0; //0: Move only, 1: left click, 2: middle click, 3: right click 
-
+        
         public struct LaunchOptions
         {
             public string ConfigFile { get; set; }
@@ -61,6 +66,8 @@ namespace TouchGamingMouse
             public double FontSize { get; set; }
             public float Opacity { get; set; }
             public bool UseAutohotkey { get; set; }
+            public bool UseGestures { get; set; }
+            public bool SendGestureMouseUp { get; set; }
             public bool MouseInterceptMode { get; set; }
             public string AutohotkeyFile { get; set; }
             public Dictionary<string, ButtonConfig> Buttons { get; set; }
@@ -78,7 +85,13 @@ namespace TouchGamingMouse
             public float TypeFlag { get; set; } //for KeyPress types: 0 = no mod, 1 = ctrl, 2 = alt, 3 = shift
             public int RepeatDelay { get; set; } //if > 0, tells scrollup/down to repeat when held down
         }
-        
+
+        public struct GestureConfig
+        {
+            public string Gesture { get; set; }
+            public string TypeParam { get; set; }
+        }
+
         //constructor and form bindings
         public MainWindow()
         {
@@ -129,6 +142,20 @@ namespace TouchGamingMouse
             if (Config.Opacity>0)
             {
                 this.Opacity = Config.Opacity;
+            }
+
+            if (Config.UseGestures)
+            {
+                gestureProps = new GestureRuntimeProps();
+                gestureProps.CursorHistory = new List<CursorPosition.PointInter>();
+                gestureProps.StartArea = CursorPosition.GetScreenCenter(GESTURE_AREA_SCALE, true);
+                gestureProps.EndArea = CursorPosition.GetScreenCenter(GESTURE_AREA_END_SCALE, true);
+                gestureProps.DivertTolerance = (int)((double)gestureProps.StartArea.Width * GESTURE_DIVERT_AREA_SCALE);
+                gestureProps.ZigCardinalSize = (int)((double)gestureProps.StartArea.Width * GESTURE_ZIG_CARDINAL_AREA_SCALE);
+                gestureProps.Timer = new DispatcherTimer();
+                gestureProps.Timer.Interval = TimeSpan.FromMilliseconds(GESTURE_TIMER_DELAY);
+                gestureProps.Timer.Tick += GestureTimer_Tick;
+                gestureProps.Timer.Start();
             }
         }
 
@@ -184,35 +211,55 @@ namespace TouchGamingMouse
             base.OnSourceInitialized(e);
 
             helper = new WindowInteropHelper(this);
-            //origStyle = GetWindowLong(helper.Handle, GWL_EXSTYLE) | WS_EX_NOACTIVATE | WS_EX_LAYERED;
-            origStyle = WS_EX_NOACTIVATE; //no taskbar icon or anything
-            
-            SetWindowLong(helper.Handle, GWL_EXSTYLE, origStyle);
+            //origStyle = GetWindowLong(helper.Handle, GWL_EXSTYLE) | WS_EX_NOACTIVATE | WS_EX_LAYERED | WS_EX_TRANSPARENT;
+            origStyle = WS_EX_NOACTIVATE| WS_EX_TOOLWINDOW; //no taskbar icon or anything
+
+            SetWindowLong(helper.Handle, GWL_STYLE, WS_CHILD);
+            SetWindowLong(helper.Handle, GWL_EXSTYLE, (uint)origStyle);
+
+            //SetWindowLong(helper.Handle, GWL_STYLE, 0xD7FF0000); //values inspected from win10 on-screen touchpad window
+            //SetWindowLong(helper.Handle, GWL_EXSTYLE, 0x0A7F77FD);
+
             var source = PresentationSource.FromVisual(this) as HwndSource;
             source.AddHook(WndProc);
         }
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+        
         private const int GWL_EXSTYLE = -20;
+        private const int GWL_STYLE = -16;
+
+        private const int WS_EX_TOOLWINDOW = 0x00000080;
+        private const int WS_CHILD = 0x40000000;
         private const int WS_EX_NOACTIVATE = 0x08000000;
         private const int WS_EX_TRANSPARENT = 0x00000020;
         private const int WS_EX_LAYERED = 0x00080000;
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == WM_MOUSEACTIVATE)
+            switch (msg)
             {
-                handled = true;
-                return new IntPtr(MA_NOACTIVATE);
-            }
-            else
-            {
-                return IntPtr.Zero;
-            }
+                case WM_MOUSEACTIVATE:
+                    handled = true;
+                    return new IntPtr(MA_NOACTIVATEANDEAT);
+                case WM_POINTERACTIVATE:
+                    handled = true;
+                    return new IntPtr(PA_NOACTIVATE);
+            }            
+            return IntPtr.Zero;    
         }
+        private const int WM_POINTERACTIVATE = 0x024B;
+        private const int WM_POINTERDOWN                  = 0x0246;
+        private const int WM_MOUSEMOVE = 0x0200;
         private const int WM_MOUSEACTIVATE = 0x0021;
         private const int MA_NOACTIVATE = 0x0003;
+        private const int MA_NOACTIVATEANDEAT = 0x0004;
+        private const int PA_NOACTIVATE = 3;
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        public static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
 
         [DllImport("user32.dll")]
         public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
@@ -480,6 +527,143 @@ namespace TouchGamingMouse
             }
         }
 
+        //gestures
+        private struct GestureRuntimeProps
+        {
+            public DispatcherTimer Timer { get; set; }
+            public List<CursorPosition.PointInter> CursorHistory { get; set; }
+            public System.Drawing.Rectangle StartArea { get; set; }
+            public System.Drawing.Rectangle EndArea { get; set; }
+            public int DivertTolerance { get; set; }
+            public int ZigCardinalSize { get; set; }
+            public CursorPosition.PointInter StartPos { get; set; }
+            public bool Started { get; set; }
+            public GestureState State { get; set; }
+        }
+
+        enum GestureState {
+            None,
+            ZigLeftHalf,
+            ZigLeft,
+            ZigRightHalf,
+            ZigRight,
+            ZigUpHalf,
+            ZigUp,
+            ZigDownHalf,
+            ZigDown,
+            CircleCCW,
+            CircleCW
+        }
+
+        private void GestureTimer_Tick(object sender, EventArgs e)
+        {
+            //TODO: gesture timeout and start timestmp
+            var cPos = CursorPosition.Pos();
+            if (!gestureProps.Started && gestureProps.StartArea.Contains(cPos.X,cPos.Y))
+            {
+                gestureProps.State = GestureState.None;
+
+                gestureProps.CursorHistory.Clear();                
+                gestureProps.Started = true;
+                gestureProps.StartPos = cPos;
+                gestureProps.CursorHistory.Add(cPos);
+            }
+
+            if (gestureProps.Started)
+            {
+                //detect cursor OOB to end gesture detection
+                if (!gestureProps.EndArea.Contains(cPos.X, cPos.Y))
+                {
+                    //TODO: check gesture state and send keyup event if applicable
+                    if (gestureProps.State == GestureState.ZigRight)
+                    {
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_D, true, InputHelper.InputType.Keyboard);
+                    }
+                    else if (gestureProps.State == GestureState.ZigLeft)
+                    {
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_A, true, InputHelper.InputType.Keyboard);
+                    }
+                    else if (gestureProps.State == GestureState.ZigUp)
+                    {
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_W, true, InputHelper.InputType.Keyboard);
+                    }
+                    else if (gestureProps.State == GestureState.ZigDown)
+                    {
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_S, true, InputHelper.InputType.Keyboard);
+                    }
+
+                    gestureProps.Started = false;
+                    gestureProps.State = GestureState.None;
+                    
+                    return;
+                }
+
+                //detect cardinal direction finish gesture step
+                if (gestureProps.State == GestureState.ZigRightHalf)
+                {
+                    if (cPos.X > gestureProps.StartPos.X && Math.Abs(cPos.Y - gestureProps.StartPos.Y) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigRight;
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_D, false, InputHelper.InputType.Keyboard);
+                    }
+                }
+                else if (gestureProps.State == GestureState.ZigLeftHalf)
+                {
+                    if (cPos.X < gestureProps.StartPos.X && Math.Abs(cPos.Y - gestureProps.StartPos.Y) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigLeft;
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_A, false, InputHelper.InputType.Keyboard);
+                    }
+                }
+                else if (gestureProps.State == GestureState.ZigUpHalf)
+                {
+                    if (cPos.Y < gestureProps.StartPos.Y && Math.Abs(cPos.X - gestureProps.StartPos.X) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigUp;
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_W, false, InputHelper.InputType.Keyboard);
+                    }
+                }
+                else if (gestureProps.State == GestureState.ZigDownHalf)
+                {
+                    if (cPos.Y > gestureProps.StartPos.Y && Math.Abs(cPos.X - gestureProps.StartPos.X) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigDown;
+                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_S, false, InputHelper.InputType.Keyboard);
+                    }
+                }
+
+                //detect cardinal direction start gestures
+                if (gestureProps.State == GestureState.None)
+                {
+                    //detect horiz zigs
+                    if (cPos.X > gestureProps.StartPos.X + gestureProps.ZigCardinalSize && Math.Abs(cPos.Y - gestureProps.StartPos.Y) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigLeftHalf; //zig left starts by moving right
+                    }
+                    else if (cPos.X < gestureProps.StartPos.X - gestureProps.ZigCardinalSize && Math.Abs(cPos.Y - gestureProps.StartPos.Y) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigRightHalf; //zig right starts by moving left
+                    }
+                    else if (cPos.Y < gestureProps.StartPos.Y - gestureProps.ZigCardinalSize && Math.Abs(cPos.X - gestureProps.StartPos.X) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigDownHalf; //zig down starts by moving up
+                    }
+                    else if (cPos.Y > gestureProps.StartPos.Y + gestureProps.ZigCardinalSize && Math.Abs(cPos.X - gestureProps.StartPos.X) <= gestureProps.DivertTolerance)
+                    {
+                        gestureProps.State = GestureState.ZigUpHalf; //zig up starts by moving down
+                    }
+                }                
+                
+                //always check for CCW and CW quadrant movement
+                //TODO
+            }
+
+            if (gestureProps.CursorHistory.Count > GESTURE_MAX_HISTORY)
+            {
+                gestureProps.CursorHistory.RemoveAt(0);
+            }
+        }
+
         //dynamic scrolling        
         private double lastScrollY;
         private CursorPosition.PointInter scrollStartPos;
@@ -582,6 +766,7 @@ namespace TouchGamingMouse
 
         private void ScUp_Repeat(object sender, EventArgs e)
         {
+            CursorPosition.MoveCursorToLastGood();
             InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_WHEEL, InputHelper.WHEEL_DELTA);
         }
 
@@ -628,7 +813,10 @@ namespace TouchGamingMouse
 
         private void ScDn_Repeat(object sender, EventArgs e)
         {
+            //mouseDisabler.EnableMouse(false);
+            CursorPosition.MoveCursorToLastGood();
             InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_WHEEL, unchecked((uint)(InputHelper.WHEEL_DELTA * -1)));
+            //mouseDisabler.DisableMouse();
         }
 
         private void BtnScDn_TouchUp(object sender, RoutedEventArgs e)
@@ -1053,6 +1241,7 @@ namespace TouchGamingMouse
 	""Height"":18,
 	""Opacity"":0.8,
     ""UseAutohotkey"":false,
+    ""UseGestures"":true,
     ""MouseInterceptMode"":true,
     ""FontSize"":24,
 	""Buttons"": {
@@ -1091,14 +1280,14 @@ namespace TouchGamingMouse
 			""Row"":17,
 			""Column"":4,
 			""Type"":""ScrollUp"",
-            ""RepeatDelay"":250
+            ""RepeatDelay"":0
 		},
 		""ScDn"": {
 			""Content"":""🖱⭣"",
 			""Row"":17,
 			""Column"":5,
 			""Type"":""ScrollDown"",
-            ""RepeatDelay"":250
+            ""RepeatDelay"":0
 		},
 		""Esc"": {
 			""Content"":""Esc"",

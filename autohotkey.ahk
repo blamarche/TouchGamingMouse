@@ -80,7 +80,7 @@ LButton::
       Sleep, 5
     }
     Click, down, Middle
-    SoundBeep
+    ;SoundBeep
     middledown:=1    
   }
   else if (ruptoggle) 

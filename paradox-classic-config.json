@@ -4,6 +4,7 @@
   "Height": 18,
   "Opacity": 0.800000012,
   "UseAutohotkey": true,
+  "UseGestures": true,
   "MouseInterceptMode": false,
   "AutohotkeyFile": "autohotkey.ahk",
   "Buttons": {
@@ -53,7 +54,7 @@
     },
     "HMouse": {
       "Content": "\uD83D\uDDB1\u2629",
-      "Column": 17,
+      "Column": 6,
       "Row": 17,
       "ColSpan": 0,
       "RowSpan": 0,
@@ -71,7 +72,7 @@
       "Type": "ScrollUp",
       "TypeParam": null,
       "TypeFlag": 0,
-      "RepeatDelay": 250
+      "RepeatDelay": 0
     },
     "ScDn": {
       "Content": "\u2B63",
@@ -82,40 +83,13 @@
       "Type": "ScrollDown",
       "TypeParam": null,
       "TypeFlag": 0,
-      "RepeatDelay": 250
-    },
-    "Esc": {
-      "Content": "Esc",
-      "Column": 8,
-      "Row": 17,
-      "ColSpan": 0,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_ESCAPE",
-      "TypeFlag": 0,
       "RepeatDelay": 0
     },
-    "Space": {
-      "Content": "Spc",
-      "Column": 9,
-      "Row": 17,
-      "ColSpan": 2,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_SPACE",
-      "TypeFlag": 0,
-      "RepeatDelay": 0
-    },
-    "Enter": {
-      "Content": "Entr",
-      "Column": 11,
-      "Row": 17,
-      "ColSpan": 0,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_RETURN",
-      "TypeFlag": 0,
-      "RepeatDelay": 0
+    "Keyboard": {
+      "Content": "🖮",
+      "Row": 6,
+      "Column": 26,
+      "Type": "ShowKeyboard"
     },
     "LShift": {
       "Content": "Shft",
@@ -191,6 +165,17 @@
       "RowSpan": 0,
       "Type": "KeyPress",
       "TypeParam": "DIK_DOWN",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "center": {
+      "Content": "\u1F78B",
+      "Column": 26,
+      "Row": 15,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_F",
       "TypeFlag": 0,
       "RepeatDelay": 0
     }
