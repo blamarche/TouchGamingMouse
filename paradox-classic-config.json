@@ -5,8 +5,24 @@
   "Opacity": 0.800000012,
   "UseAutohotkey": true,
   "UseGestures": true,
+  "SendGestureMouseUp": true,
+  "ShowGestureOverlay": true,
   "MouseInterceptMode": false,
   "AutohotkeyFile": "autohotkey.ahk",
+  "Gestures": {
+    "ZigLeft": {
+      "TypeParam": "DIK_A"
+    },
+    "ZigRight": {
+      "TypeParam": "DIK_D"
+    },
+    "ZigUp": {
+      "TypeParam": "DIK_W"
+    },
+    "ZigDown": {
+      "TypeParam": "DIK_S"
+    }
+  },
   "Buttons": {
     "HideShow": {
       "Content": "-",
@@ -169,13 +185,13 @@
       "RepeatDelay": 0
     },
     "center": {
-      "Content": "\u1F78B",
+      "Content": "🔍",
       "Column": 26,
       "Row": 15,
       "ColSpan": 0,
       "RowSpan": 0,
       "Type": "KeyPress",
-      "TypeParam": "DIK_F",
+      "TypeParam": "DIK_Q",
       "TypeFlag": 0,
       "RepeatDelay": 0
     }

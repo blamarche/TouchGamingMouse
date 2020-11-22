@@ -17,6 +17,13 @@ A great example of the type of games made playable with TouchGamingMouse are the
 * Run your game in borderless window mode, or windowed mode.
 * When done, right click the TouchGamingMouse icon in the system tray to exit.
 
+## Gestures
+
+Some configs (the default, and Paradox Classic) now support gestures which start near the center of your screen.
+
+* Zoom in / out: Start by touching near the center of the screen, then move your finger in a clockwise or counterclockwise circle. A red dot will show in the center of the screen, circle around this to emulate mouse-wheel up/down.
+* Pan the camera: Start by touching near the center of the screen. Slightly swipe in the opposite direction you wish to pan, then pull back to your starting position in the direction you wish to move.
+
 ## Advanced Usage
 ```
 Command line options for TouchGamingMouse:

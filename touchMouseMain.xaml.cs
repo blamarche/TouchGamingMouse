@@ -21,12 +21,14 @@ namespace TouchGamingMouse
     {
         const int CURSOR_WATCHER_FRAMEDELAY = 8; //8 = 125hz, 4= 250hz etc
         const int MOUSE_DISABLER_DELAY = 10;
-        const int GESTURE_TIMER_DELAY = 10;
-        const double GESTURE_AREA_SCALE = 0.25;
-        const double GESTURE_AREA_END_SCALE = 0.25;
+        const int GESTURE_TIMER_DELAY = 4;
+        const double GESTURE_AREA_SCALE = 0.17;
+        const double GESTURE_AREA_END_SCALE = 0.21;
         const int GESTURE_MAX_HISTORY = 20;
-        const double GESTURE_DIVERT_AREA_SCALE = 0.25;
+        const double GESTURE_DIVERT_AREA_SCALE = 0.10;
         const double GESTURE_ZIG_CARDINAL_AREA_SCALE = 0.05;
+        const int GESTURE_TIMEOUT_MS = 1500;
+        const int GESTURE_CIRCLE_MARGIN = 3; //min distance from center to count as being in a new quadrant
 
         private WindowInteropHelper helper;
         private int origStyle;
@@ -68,9 +70,11 @@ namespace TouchGamingMouse
             public bool UseAutohotkey { get; set; }
             public bool UseGestures { get; set; }
             public bool SendGestureMouseUp { get; set; }
+            public bool ShowGestureOverlay { get; set; }
             public bool MouseInterceptMode { get; set; }
             public string AutohotkeyFile { get; set; }
             public Dictionary<string, ButtonConfig> Buttons { get; set; }
+            public Dictionary<string, GestureConfig> Gestures { get; set; } //keys allowed: ZigUp, ZigDown, ZigLeft, ZigRight
         }
 
         public struct ButtonConfig
@@ -80,7 +84,7 @@ namespace TouchGamingMouse
             public int Row { get; set; }
             public int ColSpan { get; set; }
             public int RowSpan { get; set; }
-            public string Type { get; set; } //KeyPress, KeyPress2, KeyToggle, HideShow, LMouse, RMouse, MMouse, HMouse, ScrollUp, ScrollDown, ScrollArea (todo)
+            public string Type { get; set; } //KeyPress, KeyPress2, KeyToggle, HideShow, LMouse, RMouse, MMouse, HMouse, ScrollUp, ScrollDown
             public string TypeParam { get; set; } //DIK_SPACE, LEFTSHIFT etc
             public float TypeFlag { get; set; } //for KeyPress types: 0 = no mod, 1 = ctrl, 2 = alt, 3 = shift
             public int RepeatDelay { get; set; } //if > 0, tells scrollup/down to repeat when held down
@@ -88,8 +92,7 @@ namespace TouchGamingMouse
 
         public struct GestureConfig
         {
-            public string Gesture { get; set; }
-            public string TypeParam { get; set; }
+            public string TypeParam { get; set; } // DIK_SPACE, DIK_W
         }
 
         //constructor and form bindings
@@ -146,8 +149,11 @@ namespace TouchGamingMouse
 
             if (Config.UseGestures)
             {
+                //TODO: configurable gesture actions
+
                 gestureProps = new GestureRuntimeProps();
                 gestureProps.CursorHistory = new List<CursorPosition.PointInter>();
+                gestureProps.QuadrantHistory = new List<GestureQuadrant>();
                 gestureProps.StartArea = CursorPosition.GetScreenCenter(GESTURE_AREA_SCALE, true);
                 gestureProps.EndArea = CursorPosition.GetScreenCenter(GESTURE_AREA_END_SCALE, true);
                 gestureProps.DivertTolerance = (int)((double)gestureProps.StartArea.Width * GESTURE_DIVERT_AREA_SCALE);
@@ -156,6 +162,10 @@ namespace TouchGamingMouse
                 gestureProps.Timer.Interval = TimeSpan.FromMilliseconds(GESTURE_TIMER_DELAY);
                 gestureProps.Timer.Tick += GestureTimer_Tick;
                 gestureProps.Timer.Start();
+
+                gestureProps.GestureOverlay = new GestureOverlay();
+                gestureProps.GestureOverlay.Hide();
+                        
             }
         }
 
@@ -214,7 +224,7 @@ namespace TouchGamingMouse
             //origStyle = GetWindowLong(helper.Handle, GWL_EXSTYLE) | WS_EX_NOACTIVATE | WS_EX_LAYERED | WS_EX_TRANSPARENT;
             origStyle = WS_EX_NOACTIVATE| WS_EX_TOOLWINDOW; //no taskbar icon or anything
 
-            SetWindowLong(helper.Handle, GWL_STYLE, WS_CHILD);
+            //SetWindowLong(helper.Handle, GWL_STYLE, WS_CHILD);
             SetWindowLong(helper.Handle, GWL_EXSTYLE, (uint)origStyle);
 
             //SetWindowLong(helper.Handle, GWL_STYLE, 0xD7FF0000); //values inspected from win10 on-screen touchpad window
@@ -492,7 +502,7 @@ namespace TouchGamingMouse
 
         private void Window_TouchDown(object sender, TouchEventArgs e)
         {
-            mouseDisabler.DisableMouse(); //TODO: configable
+            mouseDisabler.DisableMouse(); 
             //e.Handled = true;
         }
 
@@ -538,7 +548,13 @@ namespace TouchGamingMouse
             public int ZigCardinalSize { get; set; }
             public CursorPosition.PointInter StartPos { get; set; }
             public bool Started { get; set; }
+            public DateTime StartTime { get; set; }
+            public bool DisableTimeout { get; set; }
             public GestureState State { get; set; }
+            public List<GestureQuadrant> QuadrantHistory { get; set; }
+            public GestureQuadrant StartQuadrant { get; set; }
+
+            public GestureOverlay GestureOverlay { get; set; }
         }
 
         enum GestureState {
@@ -551,60 +567,100 @@ namespace TouchGamingMouse
             ZigUp,
             ZigDownHalf,
             ZigDown,
+            CircleCW,
             CircleCCW,
-            CircleCW
+        }
+
+        enum GestureQuadrant
+        {
+            None,
+            TopRight,
+            TopLeft,
+            BottomLeft,
+            BottomRight,
+        }
+
+        private void SendGestureKeyUp()
+        {
+            if (gestureProps.State == GestureState.ZigRight)
+            {
+                SendGestureKey("ZigRight", true);
+            }
+            else if (gestureProps.State == GestureState.ZigLeft)
+            {
+                SendGestureKey("ZigLeft", true);
+            }
+            else if (gestureProps.State == GestureState.ZigUp)
+            {
+                SendGestureKey("ZigUp", true);
+            }
+            else if (gestureProps.State == GestureState.ZigDown)
+            {
+                SendGestureKey("ZigDown", true);
+            }
+        }
+
+        private void SendGestureKey(string gesture, bool up)
+        {
+            if (Config.Gestures.ContainsKey(gesture))
+            {
+                var r = InputHelper.GetKeyType(Config.Gestures[gesture].TypeParam);
+                if (r.Dxkeyfound)
+                    InputHelper.SendKey(r.Dxkey, up, InputHelper.InputType.Keyboard);
+                else if (r.Vkeyfound)
+                    InputHelper.SendKey(r.Vkey, up, InputHelper.InputType.Keyboard);
+            }
         }
 
         private void GestureTimer_Tick(object sender, EventArgs e)
         {
-            //TODO: gesture timeout and start timestmp
             var cPos = CursorPosition.Pos();
             if (!gestureProps.Started && gestureProps.StartArea.Contains(cPos.X,cPos.Y))
             {
+                gestureProps.CursorHistory.Clear();
+                gestureProps.QuadrantHistory.Clear();
                 gestureProps.State = GestureState.None;
-
-                gestureProps.CursorHistory.Clear();                
                 gestureProps.Started = true;
+                gestureProps.StartTime = DateTime.Now;
                 gestureProps.StartPos = cPos;
+                gestureProps.StartQuadrant = GetGestureQuadrant(cPos, gestureProps.EndArea, cPos);
+                gestureProps.DisableTimeout = false;
+
                 gestureProps.CursorHistory.Add(cPos);
+                //TODO show WS_EX_TRANSPARENT gesture area
             }
 
             if (gestureProps.Started)
             {
+                gestureProps.CursorHistory.Add(cPos);
+
                 //detect cursor OOB to end gesture detection
                 if (!gestureProps.EndArea.Contains(cPos.X, cPos.Y))
                 {
-                    //TODO: check gesture state and send keyup event if applicable
-                    if (gestureProps.State == GestureState.ZigRight)
-                    {
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_D, true, InputHelper.InputType.Keyboard);
-                    }
-                    else if (gestureProps.State == GestureState.ZigLeft)
-                    {
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_A, true, InputHelper.InputType.Keyboard);
-                    }
-                    else if (gestureProps.State == GestureState.ZigUp)
-                    {
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_W, true, InputHelper.InputType.Keyboard);
-                    }
-                    else if (gestureProps.State == GestureState.ZigDown)
-                    {
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_S, true, InputHelper.InputType.Keyboard);
-                    }
-
+                    SendGestureKeyUp();
+                    
                     gestureProps.Started = false;
                     gestureProps.State = GestureState.None;
-                    
+                    gestureProps.GestureOverlay.Hide();
                     return;
                 }
 
                 //detect cardinal direction finish gesture step
+                //TODO: turn this into a quadrant-based drag area instead of 4 discrete directions
                 if (gestureProps.State == GestureState.ZigRightHalf)
                 {
                     if (cPos.X > gestureProps.StartPos.X && Math.Abs(cPos.Y - gestureProps.StartPos.Y) <= gestureProps.DivertTolerance)
                     {
                         gestureProps.State = GestureState.ZigRight;
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_D, false, InputHelper.InputType.Keyboard);
+                        SendGestureKey("ZigRight", false);
+                        gestureProps.DisableTimeout = true;
+                        if (Config.SendGestureMouseUp) 
+                            InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP);
+                    }
+                    else if (Math.Abs(cPos.Y - gestureProps.StartPos.Y) > gestureProps.DivertTolerance)
+                    {
+                        gestureProps.DisableTimeout = false;
+                        gestureProps.State = GestureState.None;
                     }
                 }
                 else if (gestureProps.State == GestureState.ZigLeftHalf)
@@ -612,7 +668,15 @@ namespace TouchGamingMouse
                     if (cPos.X < gestureProps.StartPos.X && Math.Abs(cPos.Y - gestureProps.StartPos.Y) <= gestureProps.DivertTolerance)
                     {
                         gestureProps.State = GestureState.ZigLeft;
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_A, false, InputHelper.InputType.Keyboard);
+                        SendGestureKey("ZigLeft", false);
+                        gestureProps.DisableTimeout = true;
+                        if (Config.SendGestureMouseUp) 
+                            InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP);
+                    }
+                    else if (Math.Abs(cPos.Y - gestureProps.StartPos.Y) > gestureProps.DivertTolerance)
+                    {
+                        gestureProps.DisableTimeout = false;
+                        gestureProps.State = GestureState.None;
                     }
                 }
                 else if (gestureProps.State == GestureState.ZigUpHalf)
@@ -620,7 +684,15 @@ namespace TouchGamingMouse
                     if (cPos.Y < gestureProps.StartPos.Y && Math.Abs(cPos.X - gestureProps.StartPos.X) <= gestureProps.DivertTolerance)
                     {
                         gestureProps.State = GestureState.ZigUp;
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_W, false, InputHelper.InputType.Keyboard);
+                        SendGestureKey("ZigUp", false);
+                        gestureProps.DisableTimeout = true;
+                        if (Config.SendGestureMouseUp) 
+                            InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP);
+                    }
+                    else if (Math.Abs(cPos.X - gestureProps.StartPos.X) > gestureProps.DivertTolerance)
+                    {
+                        gestureProps.DisableTimeout = false;
+                        gestureProps.State = GestureState.None;
                     }
                 }
                 else if (gestureProps.State == GestureState.ZigDownHalf)
@@ -628,7 +700,15 @@ namespace TouchGamingMouse
                     if (cPos.Y > gestureProps.StartPos.Y && Math.Abs(cPos.X - gestureProps.StartPos.X) <= gestureProps.DivertTolerance)
                     {
                         gestureProps.State = GestureState.ZigDown;
-                        InputHelper.SendKey(InputHelper.DirectXKeyStrokes.DIK_S, false, InputHelper.InputType.Keyboard);
+                        SendGestureKey("ZigDown", false);
+                        gestureProps.DisableTimeout = true;
+                        if (Config.SendGestureMouseUp) 
+                            InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP);
+                    }
+                    else if (Math.Abs(cPos.X - gestureProps.StartPos.X) > gestureProps.DivertTolerance)
+                    {
+                        gestureProps.DisableTimeout = false;
+                        gestureProps.State = GestureState.None;
                     }
                 }
 
@@ -652,16 +732,119 @@ namespace TouchGamingMouse
                     {
                         gestureProps.State = GestureState.ZigUpHalf; //zig up starts by moving down
                     }
-                }                
+                }
                 
-                //always check for CCW and CW quadrant movement
-                //TODO
+                //always check for CCW and CW quadrant movement, reset startTime and gesture state after each trigger
+                var q = GetGestureQuadrant(cPos, gestureProps.EndArea, gestureProps.StartPos);
+                if (q != GestureQuadrant.None)
+                {
+                    if (gestureProps.QuadrantHistory.Count == 0 || q != gestureProps.QuadrantHistory[gestureProps.QuadrantHistory.Count - 1])
+                        gestureProps.QuadrantHistory.Add(q);
+                }
+
+                if (gestureProps.QuadrantHistory.Count > 1 && Config.ShowGestureOverlay)
+                {
+                    gestureProps.GestureOverlay.Show();
+                }
+
+                if (gestureProps.QuadrantHistory.Count > 4)
+                    gestureProps.QuadrantHistory.RemoveAt(0);
+                
+                if (gestureProps.QuadrantHistory.Count==4 && gestureProps.QuadrantHistory[0] == gestureProps.StartQuadrant)
+                {
+                    //TODO: optimize
+                    int scrolldir = 0; //-1 = ccw, 1 = cw
+                    var q1 = gestureProps.QuadrantHistory[1];
+                    var q2 = gestureProps.QuadrantHistory[2];
+                    var q3 = gestureProps.QuadrantHistory[3];
+                    switch (gestureProps.StartQuadrant)
+                    {
+                        case GestureQuadrant.BottomLeft:
+                            if (q1 == GestureQuadrant.BottomRight && q2 == GestureQuadrant.TopRight && q3 == GestureQuadrant.TopLeft)
+                                scrolldir = -1;
+                            else if (q1 == GestureQuadrant.TopLeft && q2 == GestureQuadrant.TopRight && q3 == GestureQuadrant.BottomRight)
+                                scrolldir = 1;
+                            break;
+
+                        case GestureQuadrant.BottomRight:
+                            if (q1 == GestureQuadrant.TopRight && q2 == GestureQuadrant.TopLeft && q3 == GestureQuadrant.BottomLeft)
+                                scrolldir = -1;
+                            else if (q1 == GestureQuadrant.BottomLeft && q2 == GestureQuadrant.TopLeft && q3 == GestureQuadrant.TopRight)
+                                scrolldir = 1;
+                            break;
+
+                        case GestureQuadrant.TopLeft:
+                            if (q1 == GestureQuadrant.BottomLeft && q2 == GestureQuadrant.BottomRight && q3 == GestureQuadrant.TopRight)
+                                scrolldir = -1;
+                            else if (q1 == GestureQuadrant.TopRight && q2 == GestureQuadrant.BottomRight && q3 == GestureQuadrant.BottomLeft)
+                                scrolldir = 1;
+                            break;
+
+                        case GestureQuadrant.TopRight:
+                            if (q1 == GestureQuadrant.TopLeft && q2 == GestureQuadrant.BottomLeft && q3 == GestureQuadrant.BottomRight)
+                                scrolldir = -1;
+                            else if (q1 == GestureQuadrant.BottomRight && q2 == GestureQuadrant.BottomLeft && q3 == GestureQuadrant.TopLeft)
+                                scrolldir = 1;
+                            break;
+                    }
+
+                    if (scrolldir==-1)
+                    {
+                        //wheelup and reset history, timeout, state
+                        InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_WHEEL, unchecked((uint)(InputHelper.WHEEL_DELTA *-1)));
+                        gestureProps.QuadrantHistory.Clear();
+                        gestureProps.StartTime = DateTime.Now;
+                        if (gestureProps.State != GestureState.None)
+                            SendGestureKeyUp();
+                        gestureProps.State = GestureState.CircleCCW;
+                        if (Config.SendGestureMouseUp)
+                            InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP);
+                    } 
+                    else if (scrolldir==1)
+                    {
+                        //wheeldown and reset history, timeout, state
+                        InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_WHEEL, unchecked((uint)(InputHelper.WHEEL_DELTA )));
+                        gestureProps.QuadrantHistory.Clear();
+                        gestureProps.StartTime = DateTime.Now;
+                        if (gestureProps.State != GestureState.None)
+                            SendGestureKeyUp();
+                        gestureProps.State = GestureState.CircleCW;
+                        if (Config.SendGestureMouseUp)
+                            InputHelper.SendMouse((uint)InputHelper.MouseEventF.MOUSEEVENTF_LEFTUP);
+                    }
+                }
+
+                //timeout
+                if (!gestureProps.DisableTimeout && DateTime.Now.Subtract(gestureProps.StartTime) >= TimeSpan.FromMilliseconds(GESTURE_TIMEOUT_MS))
+                {
+                    gestureProps.Started = false;
+                    gestureProps.State = GestureState.None;
+                    gestureProps.GestureOverlay.Hide();
+                }
             }
 
             if (gestureProps.CursorHistory.Count > GESTURE_MAX_HISTORY)
             {
                 gestureProps.CursorHistory.RemoveAt(0);
             }
+        }
+
+        private GestureQuadrant GetGestureQuadrant(CursorPosition.PointInter p, System.Drawing.Rectangle r, CursorPosition.PointInter st)
+        {
+            var cx = r.X + r.Width / 2;
+            var cy = r.Y + r.Height / 2;
+            //var cx = st.X;
+            //var cy = st.Y;
+
+            if (p.X > cx + GESTURE_CIRCLE_MARGIN && p.Y > cy + GESTURE_CIRCLE_MARGIN) return GestureQuadrant.BottomRight;
+
+            if (p.X < cx - GESTURE_CIRCLE_MARGIN && p.Y > cy + GESTURE_CIRCLE_MARGIN) return GestureQuadrant.BottomLeft;
+
+            if (p.X > cx + GESTURE_CIRCLE_MARGIN && p.Y < cy - GESTURE_CIRCLE_MARGIN) return GestureQuadrant.TopRight;
+
+            if (p.X < cx - GESTURE_CIRCLE_MARGIN && p.Y < cy - GESTURE_CIRCLE_MARGIN) return GestureQuadrant.TopLeft;
+
+            return GestureQuadrant.None;
         }
 
         //dynamic scrolling        
@@ -1242,8 +1425,24 @@ namespace TouchGamingMouse
 	""Opacity"":0.8,
     ""UseAutohotkey"":false,
     ""UseGestures"":true,
+    ""SendGestureMouseUp"":true,
+    ""ShowGestureOverlay"":true,
     ""MouseInterceptMode"":true,
     ""FontSize"":24,
+    ""Gestures"": {
+        ""ZigLeft"": {
+          ""TypeParam"": ""DIK_A""
+        },
+        ""ZigRight"": {
+          ""TypeParam"": ""DIK_D""
+        },
+        ""ZigUp"": {
+          ""TypeParam"": ""DIK_W""
+        },
+        ""ZigDown"": {
+          ""TypeParam"": ""DIK_S""
+        }
+    },
 	""Buttons"": {
 		""HideShow"": {
 			""Content"":""-"",
@@ -1372,6 +1571,13 @@ namespace TouchGamingMouse
             ""Row"": 14,
             ""Type"": ""KeyPress"",
             ""TypeParam"": ""DIK_S""
+        },
+        ""center"": {
+            ""Content"": ""🔍"",
+            ""Column"": 26,
+            ""Row"": 15,
+            ""Type"": ""KeyPress"",
+            ""TypeParam"": ""DIK_Q""
         }
 	}
 }";
