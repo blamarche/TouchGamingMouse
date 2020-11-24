@@ -5,8 +5,10 @@
   "Opacity": 0.800000012,
   "UseAutohotkey": true,
   "UseGestures": true,
+  "FontSize": 18,
   "SendGestureMouseUp": true,
   "ShowGestureOverlay": true,
+  "GestureOverlayPanOpacity": 0.1,
   "MouseInterceptMode": false,
   "AutohotkeyFile": "autohotkey.ahk",
   "Gestures": {
@@ -80,7 +82,7 @@
       "RepeatDelay": 0
     },
     "ScUp": {
-      "Content": "\u2B61",
+      "Content": "🔍\u2B61",
       "Column": 4,
       "Row": 17,
       "ColSpan": 0,
@@ -91,7 +93,7 @@
       "RepeatDelay": 0
     },
     "ScDn": {
-      "Content": "\u2B63",
+      "Content": "🔍\u2B63",
       "Column": 5,
       "Row": 17,
       "ColSpan": 0,
@@ -140,54 +142,10 @@
       "TypeFlag": 0,
       "RepeatDelay": 0
     },
-    "left": {
-      "Content": "\u2190",
-      "Column": 26,
-      "Row": 12,
-      "ColSpan": 0,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_LEFT",
-      "TypeFlag": 0,
-      "RepeatDelay": 0
-    },
-    "right": {
-      "Content": "\u2192",
-      "Column": 26,
-      "Row": 13,
-      "ColSpan": 0,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_RIGHT",
-      "TypeFlag": 0,
-      "RepeatDelay": 0
-    },
-    "up": {
-      "Content": "\u2191",
+    "center": {
+      "Content": "🎥",
       "Column": 26,
       "Row": 11,
-      "ColSpan": 0,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_UP",
-      "TypeFlag": 0,
-      "RepeatDelay": 0
-    },
-    "down": {
-      "Content": "\u2193",
-      "Column": 26,
-      "Row": 14,
-      "ColSpan": 0,
-      "RowSpan": 0,
-      "Type": "KeyPress",
-      "TypeParam": "DIK_DOWN",
-      "TypeFlag": 0,
-      "RepeatDelay": 0
-    },
-    "center": {
-      "Content": "🔍",
-      "Column": 26,
-      "Row": 15,
       "ColSpan": 0,
       "RowSpan": 0,
       "Type": "KeyPress",
