@@ -453,11 +453,11 @@ namespace TouchGamingMouse
             uint flagtosend;
             if (KeyUp)
             {
-                flagtosend = (uint)(KeyEventF.KeyUp | KeyEventF.Scancode);
+                flagtosend = (uint)(KeyEventF.KeyUp );
             }
             else
             {
-                flagtosend = (uint)(KeyEventF.KeyDown | KeyEventF.Scancode);
+                flagtosend = (uint)(KeyEventF.KeyDown );
             }
 
             Input[] inputs =
@@ -496,7 +496,7 @@ namespace TouchGamingMouse
             }
             else
             {
-                flagtosend = (uint)(KeyEventF.KeyDown | KeyEventF.Scancode);
+                flagtosend = (uint)(KeyEventF.Scancode);
             }
 
             Input[] inputs =

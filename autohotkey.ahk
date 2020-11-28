@@ -3,7 +3,7 @@
 SLEEP_DELAY:=2 ;this will need to be adjusted per machine performance most likely
                ;as it works around the weird microsoft behavior in directx games
 
-SLEEP_DELAYUP:=50
+SLEEP_DELAYUP:=40
 
 SetDefaultMouseSpeed, 0
 SetMouseDelay, -1
