@@ -1,0 +1,113 @@
+{
+  "Name": "Total War Shogun 2",
+  "Width": 27,
+  "Height": 18,
+  "Opacity": 0.800000012,
+  "UseAutohotkey": true,
+  "UseGestures": true,
+  "FontSize": 18,
+  "SendGestureMouseUp": true,
+  "ShowGestureOverlay": true,
+  "GestureOverlayPanOpacity": 0.1,
+  "MouseInterceptMode": false,
+  "AutohotkeyFile": "autohotkey.ahk",
+  "Gestures": {
+    "ZigLeft": {
+      "TypeParam": "DIK_A"
+    },
+    "ZigRight": {
+      "TypeParam": "DIK_D"
+    },
+    "ZigUp": {
+      "TypeParam": "DIK_W"
+    },
+    "ZigDown": {
+      "TypeParam": "DIK_S"
+    }
+  },
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 0,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "MMouse": {
+      "Content": "\uD83D\uDDB1M",
+      "Column": 19,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "MMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "RMouse": {
+      "Content": "\uD83D\uDDB1R",
+      "Column": 20,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "RMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Keyboard": {
+      "Content": "🖮",
+      "Row": 17,
+      "Column": 21,
+      "Type": "ShowKeyboard"
+    },
+    "Next": {
+      "Content": "Next",
+      "Column": 23,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_PERIOD",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Speed": {
+      "Content": "Speed",
+      "Column": 24,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_SPACE",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "RotL": {
+      "Content": "RotL",
+      "Column": 16,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Q",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "RotR": {
+      "Content": "RotR",
+      "Column": 17,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_E",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    }
+  }
+}
