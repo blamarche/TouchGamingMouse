@@ -1,0 +1,102 @@
+{
+  "Name": "Paradox",
+  "Width": 27,
+  "Height": 18,
+  "Opacity": 0.800000012,
+  "UseAutohotkey": true,
+  "UseGestures": true,
+  "FontSize": 18,
+  "SendGestureMouseUp": true,
+  "ShowGestureOverlay": true,
+  "GestureOverlayPanOpacity": 0.1,
+  "MouseInterceptMode": false,
+  "AutohotkeyFile": "autohotkey.ahk",
+  "Gestures": {
+    "ZigLeft": {
+      "TypeParam": "DIK_A"
+    },
+    "ZigRight": {
+      "TypeParam": "DIK_D"
+    },
+    "ZigUp": {
+      "TypeParam": "DIK_W"
+    },
+    "ZigDown": {
+      "TypeParam": "DIK_S"
+    }
+  },
+  "Buttons": {
+    "HideShow": {
+      "Content": "-",
+      "Column": 0,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HideShow",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "HMouse": {
+      "Content": "\uD83D\uDDB1\u2629",
+      "Column": 6,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "HMouse",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "ScUp": {
+      "Content": "🔍\u2B61",
+      "Column": 4,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ScrollUp",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "ScDn": {
+      "Content": "🔍\u2B63",
+      "Column": 5,
+      "Row": 17,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "ScrollDown",
+      "TypeParam": null,
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "Keyboard": {
+      "Content": "🖮",
+      "Row": 6,
+      "Column": 26,
+      "Type": "ShowKeyboard"
+    },
+    "Q": {
+      "Content": "RotL",
+      "Column": 26,
+      "Row": 7,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_Q",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    },
+    "E": {
+      "Content": "RotR",
+      "Column": 26,
+      "Row": 8,
+      "ColSpan": 0,
+      "RowSpan": 0,
+      "Type": "KeyPress",
+      "TypeParam": "DIK_E",
+      "TypeFlag": 0,
+      "RepeatDelay": 0
+    }
+  }
+}
