@@ -37,6 +37,8 @@ Command line options for TouchGamingMouse:
 
 Example: `TouchGamingMouse.exe --config=dice-config.json`
 
+Replace `autohotkey.ahk` with `autohotkey-alternate.ahk` if you experience issues as reported here: https://github.com/blamarche/TouchGamingMouse/issues/7
+
 ## Thanks
 Thank you to the developers of AutoHotkey!
 
